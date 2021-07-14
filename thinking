@@ -1,0 +1,246 @@
+#!/usr/bin/perl
+use 5.12.4;
+no strict "refs";
+use integer;
+our $currentgrid="136616615236353623221216233335121145666352354552411525164444141462466354536213233463426432125213456451522242565145314544361534342466543151135454";
+my @temp = split //, $currentgrid;
+
+our %forminput;
+our @A;
+our @horde;
+push @horde, 0;
+our %horde;
+$horde{0} = $temp[0];
+our %newbies;
+our @newbies;
+our $toadd=1;
+our $rethord;
+our $cycle=0;
+
+open OUTPUTFILE, '>/Library/WebServer/Documents/chg.html' || die "open failed: $!";
+select OUTPUTFILE;
+select STDOUT;
+
+sub parsedata {
+my $forminput = $ENV{'QUERY_STRING'};
+
+my @forminput = split(/&/, $forminput);
+
+foreach my $i (0 .. $#forminput)
+{
+ $forminput[$i] =~ s/\+/ /g;
+ $forminput[$i] =~ s/%(..)/pack("c",hex($1))/ge;
+ (my $key, my $val) = split(/=/,$forminput[$i],2);
+ $forminput{$key} .= '\0' if (defined($forminput{$key}));
+ $forminput{$key} .= $val;
+}
+}
+sub end() {
+my $B = "#6A5ACD";
+my $L = "#00FFFF";
+my $G = "#6B8E23";
+my $Y = "#FFFF00";
+my $R = "#FF0000";
+my $P = "#FFB6C1";
+for my $i (0..143){
+	if ($A[$i] == 1) {
+		$A[$i] = $B;
+	}
+	if ($A[$i] == 2) {
+		$A[$i] = $L;
+	}
+	if ($A[$i] == 3) {
+		$A[$i] = $G;
+	}
+	if ($A[$i] == 4) {
+		$A[$i] = $Y;
+	}
+	if ($A[$i] == 5) {
+		$A[$i] = $R;
+	}
+	if ($A[$i] == 6) {
+		$A[$i] = $P;
+	}
+}
+
+#########printgrid#############
+if ($cycle > 22){
+	print "<center><h1>Good Game</h1>";
+	print "<table cellspacing=0>\n<tr>\n";
+	for my $i(1..144){
+		print "<td bgcolor=",shift(@A)," width=20 height=20></td>\n";
+		if ($i % 12 == 0){
+			print  "</tr>\n<tr>\n";
+		}
+	}
+	die;
+}
+print "<center><h1>Hello, world! ";
+my $turn = (23-$cycle);
+print "$turn turns left</h1>\n";
+print "<table cellspacing=0>\n<tr>\n";
+for my $i(1..144){
+	print "<td bgcolor=",shift(@A)," width=20 height=20></td>\n";
+	if ($i % 12 == 0){
+		print  "</tr>\n<tr>\n";
+	}
+}
+print "</tr>\n</table>\n<p>\n";
+#########end printgrid#############
+
+#########printbuttons#############
+print <<"EOF" ;
+<table>
+<tr>
+<td bgcolor=#6A5ACD width=25 height=25>
+<form action="http://helios.local/cgi-bin/colorrun.pl" method="get">
+<input type="hidden" name="toadd" value="1">
+<input type="hidden" name="currentgrid" value="$currentgrid">
+<input type="hidden" name="horde" value="$rethord">
+<input type="hidden" name="cycle" value="$cycle">
+<input type="submit" value="Submit">
+</form>
+</td>
+<td bgcolor=#00FFFF width=25 height=25>
+<form action="http://helios.local/cgi-bin/colorrun.pl" method="get">
+<input type="hidden" name="toadd" value="2">
+<input type="hidden" name="currentgrid" value="$currentgrid">
+<input type="hidden" name="horde" value="$rethord">
+<input type="hidden" name="cycle" value="$cycle">
+<input type="submit" value="Submit">
+</form>
+</td>
+<td bgcolor=#6B8E23 width=25 height=25>
+<form action="http://helios.local/cgi-bin/colorrun.pl" method="get">
+<input type="hidden" name="toadd" value="3">
+<input type="hidden" name="currentgrid" value="$currentgrid">
+<input type="hidden" name="horde" value="$rethord">
+<input type="hidden" name="cycle" value="$cycle">
+<input type="submit" value="Submit">
+</form>
+</td>
+<td bgcolor=#FFFF00 width=25 height=25>
+<form action="http://helios.local/cgi-bin/colorrun.pl" method="get">
+<input type="hidden" name="toadd" value="4">
+<input type="hidden" name="currentgrid" value="$currentgrid">
+<input type="hidden" name="horde" value="$rethord">
+<input type="hidden" name="cycle" value="$cycle">
+<input type="submit" value="Submit">
+</form>
+</td>
+<td bgcolor=#FF0000 width=25 height=25>
+<form action="http://helios.local/cgi-bin/colorrun.pl" method="get">
+<input type="hidden" name="toadd" value="5">
+<input type="hidden" name="currentgrid" value="$currentgrid">
+<input type="hidden" name="horde" value="$rethord">
+<input type="hidden" name="cycle" value="$cycle">
+<input type="submit" value="Submit">
+</form>
+</td>
+<td bgcolor=#FFB6C1 width=25 height=25>
+<form action="http://helios.local/cgi-bin/colorrun.pl" method="get">
+<input type="hidden" name="toadd" value="6">
+<input type="hidden" name="currentgrid" value="$currentgrid">
+<input type="hidden" name="horde" value="$rethord">
+<input type="hidden" name="cycle" value="$cycle">
+<input type="submit" value="Submit">
+</form>
+</td></tr></table>
+
+EOF
+#########end printbuttons#############
+
+#########printhtmlclose#############
+print "</html>\n</body>\n";
+#########end printhtmlclose#############
+}
+sub addnewbies(){
+my $newbies = keys %newbies;
+@horde = keys %horde;
+for my $i (@horde){
+	my $right = ($i+1);
+	my $left = ($i-1);
+	my $up = ($i-12);
+	my $down = ($i+12);
+	if (($i % 12 != 11) and ($A[$right] == $_[0])){
+		$newbies{$right}=$_[0];
+	}
+	if (($i % 12 != 0) and ($A[$left] == $_[0])){
+		$newbies{$left}=$_[0];
+	}
+	if (($i > 11) and ($A[$up] == $_[0])){
+		$newbies{$up}=$_[0];
+	}
+	if (($i < 132) and ($A[$down] == $_[0])){
+		$newbies{$down}=$_[0];
+	}
+}
+if ($newbies == keys %newbies){
+	$cycle++;
+	return;
+}
+@newbies = keys %newbies;
+print "RUN TEST";
+&hordeincrease();
+&addnewbies($toadd);
+}
+sub hordecoloring(){
+for my $i (@horde){
+	$A[$i] = $toadd;
+}
+}
+sub updategrid(){
+	$currentgrid = join "", @A;
+}
+sub hordeincrease(){
+	push @horde, @newbies;
+	for my $i(@horde){
+		$horde{$i} = $A[$i];
+	}
+	$rethord = join ",", (keys %horde);
+}
+
+#if we have input put from the web form, assign those values to our working variables
+&parsedata;
+if ($forminput{currentgrid}) {
+	$currentgrid = $forminput{currentgrid};
+}
+# @A contains the grid with 1-6 values
+our @A = split //, $currentgrid;
+
+if ($forminput{toadd}) {
+	$toadd = $forminput{toadd};
+}
+if ($forminput{horde}) {
+	$rethord = $forminput{horde};
+	foreach (split /,/, $rethord){
+		$horde{$_} = $toadd;
+	}
+}
+if ($forminput{cycle}) {
+	$cycle = $forminput{cycle};
+}
+
+
+#######print http headers##########
+print "Content-Type: text/html\n\n";
+# Note there must a blank line between 
+# the last header and the HTML Data
+#######end print http headers##########
+
+#########printhtmlopen#############
+print "<html> <head>\n";
+print "<title>Jules's Color Horde Game: /Library/Webserver/CGI-Executables/colorrun.pl</title>";
+print "</head>\n";
+print "<body>\n";
+#########end printhtmlopen#############
+
+print "This is what we got from the form - $ENV{'QUERY_STRING'}\n";
+
+&addnewbies($toadd);
+&hordeincrease();
+&hordecoloring($toadd);
+&updategrid;
+my $indexes = $#newbies + 1;
+print "This is $currentgrid You added $indexes";
+&end;

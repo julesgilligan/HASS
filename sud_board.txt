@@ -1,0 +1,229 @@
+#!/usr/bin/perl
+
+# nine arrays, cell 1-9;
+# four elements per cell;
+# 0 ele = cell num;
+# print cells' 0, groups of three;
+
+use v5.12.4;
+no strict "refs";
+
+#visible value, 1-2-3 slots, row, column;
+our @cell1=(0,0,0,0,1,1);
+our @cell2=(0,0,0,0,1,2);
+our @cell3=(0,0,0,0,1,3);
+our @cell4=(0,0,0,0,2,1);
+our @cell5=(0,0,0,0,2,2);
+our @cell6=(0,0,0,0,2,3);
+our @cell7=(0,0,0,0,3,1);
+our @cell8=(0,0,0,0,3,2);
+our @cell9=(0,0,0,0,3,3);
+
+our @row1=(1,2,3);
+our @row2=(4,5,6);
+our @row3=(7,8,9);
+our @col1=(1,4,7);
+our @col2=(2,5,8);
+our @col3=(3,6,9);
+
+
+sub printtable(){
+	my $val = $_[0];
+	print "Values in subscript $val\n";
+	foreach my $foo (qw/1 2 3 4 5 6 7 8 9/){
+		my $com = ("cell" . $foo);
+		print "$com->[$val] ";
+		if (! ($foo % "3")){	#add a new line every three cells, using modulus op (%);
+			print "\n";
+		}
+	}
+	#print "$com->[$val] ";
+}
+	#&printtable;
+
+	#version two;
+	#our @row1=($cell1[0],$cell2[0],$cell3[0]);
+	#our @row2=($cell4[0],$cell5[0],$cell6[0]);
+	#our @row3=($cell7[0],$cell8[0],$cell9[0]);
+	#print "$row1\n$row2\n$row3\n\n";
+	#version three;		
+	#my $way3=("$row1\n$row2\n$row3\n");
+	#print "$way3";
+
+sub changecellfromcl(){
+	my (@inputs) = split(" ", <STDIN>);
+		foreach my $input (@inputs) {
+		my ($site1, $value1) = split(",", $input);
+		my $fullsite1 = ("cell" . $site1);
+		$fullsite1->[0] = $value1;
+		chomp($fullsite1->[0]);
+	}
+}
+
+sub changecell(){
+	my($site, $value) = @_ ;
+	my $fullsite = ("cell" . $site);
+	$fullsite->[0] = $value;
+	chomp($fullsite->[0]);
+}
+
+	#print "This is fullsight $fullsite\n";
+	#print "This is fullsight[0] $fullsite->[0]\n";
+
+#&changecellfromcl();
+#&changecell(3,5);
+#&prunepossibles;
+#&printtable;
+
+
+	#for/ while loop derive name and value incrementally;
+	#pass name and value to &changecell;
+
+	#my $i=1;	
+	#while ($i<10){
+	#	&changecell($i,$i);
+	#	$i++;
+	#}
+
+
+
+	#foreach my $foo (qw/1 2 3 4 5 6 7 8 9/){
+	#	&changecell($foo,$foo);
+	#}
+
+#if ($cell1[0]){
+#	my $modify = $cell1[0];
+#	("$cell2[$modify], $cell3[$modify], $cell4[$modify], $cell7[$modify]")=1;
+#}
+#&printtable(2);
+
+#if ($cell1[0]){
+#	my $modify = $cell1[0];
+#	$cell2[$modify]=1;
+#	$cell3[$modify]=1;
+#	$cell4[$modify]=1;
+#	$cell7[$modify]=1;
+#	&printtable(2);
+#}
+
+
+sub prunepossibles(){
+	foreach my $num (1,2,3,4,5,6,7,8,9) {
+		my $original = ("cell" . $num);
+		my $modify = ($original->[0]);	
+		if ($modify > 0){
+			my $rownum = ($original->[4]);
+			my $fullrow = ("row" . $rownum);
+			if ($rownum == 1){
+				$cell1[$modify]=1;
+				$cell2[$modify]=1;
+				$cell3[$modify]=1;
+			}
+			if ($rownum == 2){
+				$cell4[$modify]=1;
+				$cell5[$modify]=1;
+				$cell6[$modify]=1;
+			}
+			if ($rownum == 3){
+				$cell7[$modify]=1;
+				$cell8[$modify]=1;
+				$cell9[$modify]=1;
+			}
+			my $colnum = ($original->[5]);
+			my $fullcol = ("col" . $colnum);
+			if ($colnum == 1){
+				$cell1[$modify]=1;
+				$cell4[$modify]=1;
+				$cell7[$modify]=1;
+			}
+			if ($colnum == 2){
+				$cell2[$modify]=1;
+				$cell5[$modify]=1;
+				$cell8[$modify]=1;
+			}
+			if ($colnum == 3){
+				$cell3[$modify]=1;
+				$cell6[$modify]=1;
+				$cell9[$modify]=1;
+			}
+		}
+	}
+}
+sub setzero(){
+	foreach my $num (1,2,3,4,5,6,7,8,9){
+	my $figure = ("cell" . $num);
+		if (! $figure->[0]){
+			if ($figure->[1]){
+				if ($figure->[2]){
+					if ($figure->[3]){
+					print "ERROR\n";
+					}
+					$figure->[0] = 3;
+				}
+				if ($figure->[3]){
+					$figure->[0] = 2;
+				}
+			}
+			if ($figure->[2]){
+				if ($figure->[3]){
+					$figure->[0] = 1;
+				}
+			}
+		}
+	}
+}
+
+sub setzero2() {
+	foreach my $num (1..9) {
+		my $figure = ("cell" . $num);
+		if (! $figure->[0]) {
+			my $cycle = 1;
+			while ($cycle < 10) {
+				if ($figure->[$cycle]) {	
+					$cycle++;
+				}
+				if (!($figure->[$cycle])) {
+					my $store .= $cycle;
+					$cycle++;
+				}
+			}
+		}
+	}
+}
+
+sub prune2(){
+	foreach my $num (1,2,3,4,5,6,7,8,9) {
+		my $original = ("cell" . $num);
+		my $modify = ($original->[0]);	
+		if ($modify > 0){
+			my $rownum = ($original->[4]);
+			my $fullrow = ("row" . $rownum);
+			foreach my $cellnum (@{$fullrow}){
+				my $fullcell = ("cell" . $cellnum);
+				$fullcell->[$modify] = 1;
+			}
+			my $colnum = ($original->[5]);
+			my $fullcol = ("col" . $colnum);
+			foreach my $cllnum (@{$fullcol}){
+				my $fllcell = ("cell" . $cllnum);
+				$fllcell->[$modify] = 1;
+			}
+		}
+	}
+}
+
+#&printtable;
+#&changecellfromcl;
+#until ($cell1[0] + $cell2[0] + $cell3[0] + $cell4[0] + $cell5[0] + $cell6[0] + $cell7[0] + $cell8[0] + $cell9[0] == 18){
+#	&prune2;
+#	&setzero;
+#}
+#&printtable(0);
+#&printtable(1);
+
+&printtable;
+&changecellfromcl;
+&prune2;
+&setzero;
+&printtable(0);
+&printtable(1);
