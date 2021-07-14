@@ -46,8 +46,8 @@ foreach my $number (0..80) {
 		$cells[$number][$b]=0;
 	}
 
-	$cells[$number][10] = int ($number / 9) + 1; 	#set row by dividing by 9
-	$cells[$number][11] = ($number % 9) + 1;		#set col by mod by 9
+	#$cells[$number][10] = int ($number / 9) + 1; 	#set row by dividing by 9
+	#$cells[$number][11] = ($number % 9) + 1;		#set col by mod by 9
 													#box number is retrieved by &getbox
 	$cells[$number][12] = 0; 						# 1 means already pruned
 
@@ -96,7 +96,8 @@ our @box9 = (60,61,62,69,70,71,78,79,80);
 
 #Calls for and splits input string into 81 cell arrays
 sub change81 {
-	our @81 = split //, $defaultBoard;#<STDIN>;
+	print "Gimme your board. 81 characters with either 0s or .s\n";
+	our @81 = split //, <STDIN>;# $defaultBoard;#
 	foreach my $placevalue (0..80){
 		$cells[$placevalue][0] = $81[$placevalue];
 	}
@@ -161,7 +162,6 @@ sub pruneoptions(){
 
 
 sub hiddenSingles() {
-	print "Hs\n";
 	my @groupTypes = qw(box row col);
 	my @groupNums = (1..9);
 	my @groupNames = map {(@$_[0] . @$_[1])} Combinations( \@groupTypes, \@groupNums );
@@ -190,7 +190,6 @@ sub hiddenSingles() {
 }
 
 sub nakedSingles() {
-	print "Ns\n";
 	my $progress;
 	foreach my $num (0..80) {
 		if ($cells[$num][0] == 0) {
@@ -211,9 +210,7 @@ sub nakedSingles() {
 }
 
 #infers hard(er) subscript changes
-sub bobsled {
-	# technical strategy is pointing pair
-	print "b\n";
+sub pointingPair {
 	my @old;
 	foreach my $i (0..80){
 		foreach my $j (0..9){
@@ -246,10 +243,10 @@ sub bobsled {
 					logMessage(my $m = "same column: GetCol($cell)");
 					apply { $cells[$_][$change] = 1; }  @{ ("col" . &GetCol($cell)) };
 				}
-				#set the bobsleding cells back to open
+				#set the pointingPair cells back to open
 				$cells[$cell][$change] = 0;
 				$cells[$name][$change] = 0;
-				logMessage(my $m = "bobsled $real $ral [$change]");
+				logMessage(my $m = "pointingPair $real $ral [$change]");
 			}
 		}
 	}
@@ -271,7 +268,6 @@ sub bobsled {
 sub nakedPairs {
 	# scan grid for two naked in a cell
 	# see if the cells with two naked share a group
-	print "Np\n";
 	my @old;
 	foreach my $i (0..80){
 		foreach my $j (0..9){
@@ -372,7 +368,7 @@ sub logMessage {
 }
 
 sub working {
-	while ( &nakedSingles or &hiddenSingles or &nakedPairs or &bobsled) {
+	while ( &nakedSingles or &hiddenSingles or &nakedPairs or &pointingPair) {
 		&pruneoptions;
 	}
 }
