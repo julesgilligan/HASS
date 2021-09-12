@@ -183,6 +183,7 @@ sub hiddenSingles() {
 	}
 
 	if ($progress){
+		logMessage(my $m = "HIDDEN-SINGLES SUCCEEDED");
 		return 1;
 	} else { 
 		return 0;
@@ -203,6 +204,7 @@ sub nakedSingles() {
 	}
 	
 	if ($progress){
+		logMessage(my $m = "NAKED-SINGLES SUCCEEDED");
 		return 1;
 	} else {
 		return 0;;
@@ -312,6 +314,7 @@ sub nakedPairs {
 		}
 	}
 	if ($dif){
+		logMessage(my $m = "NAKED-PAIRS SUCCEEDED");
 		return 1;
 	} else {
 		return 0;
