@@ -32,6 +32,9 @@ EASY uses "Naked and Hidden Singles"
 
 MED needs "Naked Pairs"
 	400000938032094100095300240370609004529001673604703090957008300003900400240030709
+
+MED needs "Naked Triples"
+	2.9.84......6....88...217.3...19..8.5.......7.2..68...7.581...23....6......27.1.4 
 =cut
 
 
@@ -396,16 +399,18 @@ sub print81{
 &pruneoptions;
 &working;
 &prettyprint(0);
+
 =begin comment
+=cut	
 print "Subscript (S) or Edit (E)?";
 my $input = <STDIN>;
 chomp($input);
 print ">>$input<<\n";
 if ($input eq "S"){
-	print "Which subscripts? start,end\n";
-	(my $start, my $end) = split(/,/, <STDIN>);
-	chop($end);
-	&display($start,$end);
+	print "Which subscript?\n";
+	my $input = <STDIN>;
+	chomp($input);
+	&printtable($input);
 }elsif ($input eq "E"){
 	my $approval = "N";
 	while (!($approval eq "Y")){
@@ -429,4 +434,3 @@ if ($input eq "S"){
 	print "Goodbye.\n";
 	&print81;
 }	
-=cut	

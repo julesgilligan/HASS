@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <table id="game_grid" class="sudoku_board">
+    </table>
+
+    <script>
+        /* Setting up the blank board with all notes */
+        var game = document.getElementById("game_grid");
+
+        var notes = document.createElement("div");
+        notes.classList.add("notes_list");
+        for (let i = 1; i <= 9; i++) {
+            note = document.createElement("span");
+            note.classList.add("note");
+            note.innerHTML = i;
+            notes.appendChild(note);
+        }
+
+        for (let i = 0; i < 9; i++) {
+            var row = game.insertRow();
+            row.classList.add("row");
+            for (let j = 0; j < 9; j++) {
+                var cell = document.createElement("td");
+                cell.classList.add("cell");
+                cell.appendChild(notes.cloneNode(true));
+                row.appendChild(cell);
+            }
+        }
+    </script>
+
+    <script src="script.js"></script>
+</body>
