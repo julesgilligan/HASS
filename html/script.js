@@ -1,49 +1,34 @@
+/*
+TODO:
+algorithm:
+- hidden pairs?
+- naked triple
+
+functionality:
+- explaining where a number came from
+- match "human effort" by only choosing groups with few openings or numbers with many
+*/
+
 
 var defaultBoard = '000105000140000670080002400063070010900000003010090520007200080026000035000409000';
-/*
-class Options{
 
-    fill(val) {
-        for (let i = 0; i < 9; i++){
-            this[i] = val;
-        }
-        return this
-    }
-    get_index(i) {
-        return this[i];
-    }
-    set_index(i, val) {
-        this[i] = val;
-    }
-    set_option(o, val) {
-        this.set_index(o-1, val);
-    }
-    open() {
-        let lst = []
-        for (let i = 0; i < 9; i++){
-            if (!this[i]){
-                lst.push(i);
-            }
-        }
-        return lst;
-    }
-}*/
+function text_changed(arg) {
+    change81(arg.value);
+    printtable();
+}
 
 class Options{
 
     fill(val) {
-        this.data = []
-        if (val === false)
+        this.data = [];
+        if (val === false) {
             for (let i = 1; i <= 9; i++){
                 this.data.push(i);
-            }
+        }}
         return this
     }
-    get_index(i) {
-        return !this.data.includes(i+1);
-    }
-    set_index(i, val) {
-        this.set_option(i+1, val);
+    get_option(o) {
+        return !this.data.includes(o);
     }
     set_option(o, val) {
         if (val === true){
@@ -64,7 +49,6 @@ var cells = new Array(81);
 for (let i = 0; i < 81; i++){
     let cell = {vis: 0, options: new Options().fill(false), pruned: false};
     cells[i] = cell
-    /*cells[i] = new Array(11).fill(false, 1); /* cells[10] is already pruned */
 }
 
 var rows = new Array(9);
@@ -100,19 +84,59 @@ make_groups();
 function change81(input){
     /* Accept input of 81 char for board */
     var in_board = Array.from(input).map(Number);
-    for (let i = 0; i < 81; i++) {
-        if (typeof in_board[i] == 'number' && in_board[i] > 0){
-            cells[i].vis = parseInt(in_board[i]);
-        }   
-        
-    }
+    in_board.forEach( (el, i) => {
+        if (i < 81 && typeof el == 'number' && el >= 0) {
+            cells[i].vis = parseInt(el);
+            cells[i].reason = "Given";
+        }
+    });
+}
+
+function repair_options(){
+    cells.forEach(cell => {
+        cell.options.fill(false);
+        cell.pruned = false;
+    });
+    prune_options();
+    printtable();
+}
+
+function button_clicked() {
+    let strategies = document.querySelectorAll("#side_panel input[type='checkbox']:checked");
+    strategies.forEach(node => {
+        switch (node.id){
+            case "check_HS":
+                follow_strat(hiddenSingles);
+                break;
+            case "check_NS":
+                follow_strat(nakedSingles);
+                break;
+            case "check_NP":
+                follow_strat(nakedPairs);
+                break;
+            case "check_PP":
+                follow_strat(pointingPair);
+                break;
+        }
+    })
+    prune_options();
+    printtable();
+}
+
+function show_reasons(evt) {
+    let index = evt.currentTarget.index;
+    console.log(cells[index].reason);
+}
+
+function hide_reasons(evt) {
+
 }
 
 function make_notes_list(cell_obj) {
     var notes = document.createElement("div");
     notes.classList.add("notes_list");
     cell_obj.options.open().forEach(option => {
-        note = document.createElement("span");
+        let note = document.createElement("span");
         note.classList.add("note");
         note.innerHTML = option;
         notes.appendChild(note);
@@ -124,9 +148,21 @@ function printtable(){
     /* print cells to the board*/
     let board = document.getElementById("game_grid");
     let board_cells = board.querySelectorAll(".cell");
+    let was_added = board.querySelectorAll(".just_added");
+    was_added.forEach(added => {
+        added.classList.remove("just_added");
+        added.removeEventListener('mouseover', show_reasons);
+        added.removeEventListener('mouseout', hide_reasons);
+    });
     for (let i = 0; i < 81; i++) {
         if (cells[i].vis != 0){
-            board_cells[i].innerHTML = cells[i].vis;
+            if (board_cells[i].innerHTML != cells[i].vis) {
+                board_cells[i].innerHTML = cells[i].vis;
+                board_cells[i].classList.add("just_added");
+                board_cells[i].index = i;
+                board_cells[i].addEventListener('mouseover', show_reasons);
+                board_cells[i].addEventListener('mouseout', hide_reasons);
+            }
         } else {
             board_cells[i].replaceChildren(make_notes_list(cells[i]));
         }
@@ -202,14 +238,14 @@ function prune_options(){
 function hiddenSingles() {
     let progress = [];
     rows.concat(cols, boxes).forEach(group => {
-        for (let opt = 0; opt < 9; opt++) {
+        for (let opt = 1; opt <= 9; opt++) {
             let open_places = group.filter(num => 
-                cells[num].options.get_index(opt) == false
+                cells[num].options.get_option(opt) == false
             );
             if (open_places.length == 1){
                 set = open_places[0];
-                if ( cells[set].vis != (opt + 1) ){
-                    progress.push({"who": 'HS', "where": set, "what": opt + 1});
+                if ( cells[set].vis != (opt) ){
+                    progress.push({"who": 'HS', "where": set, "what": opt});
                 }
             }
         }
@@ -255,8 +291,8 @@ function nakedPairs() {
                         Maybe move this to the eventual Do and Log func */
                         opts = pairs_possible[key1];
                         remaining = group.filter(num => 
-                            cells[num].options.get_index(opts[0]) == false ||
-                            cells[num].options.get_index(opts[1]) == false
+                            cells[num].options.get_option(opts[0]) == false ||
+                            cells[num].options.get_option(opts[1]) == false
                         );
                         if (remaining.length > 2)
                             progress.push({"who":'NP', "where": group, "because":[parseInt(key1), parseInt(key2)]})
@@ -273,9 +309,9 @@ function nakedPairs() {
 function pointingPair() {
     let progress = [];
     boxes.forEach(box => {
-        for (let opt = 0; opt < 9; opt++) {
+        for (let opt = 1; opt <= 9; opt++) {
             let open_places = box.filter(num => 
-                cells[num].options.get_index(opt) == false
+                cells[num].options.get_option(opt) == false
             );
             if (open_places.length == 2){
                 // Will always find Box in common, just ignore that
@@ -285,10 +321,10 @@ function pointingPair() {
                     /* Technically unnecessary check if this is worth pushing
                     Maybe move this to the eventual Do and Log func */
                     remaining = group.filter(num => 
-                        cells[num].options.get_index(opt) == false
+                        cells[num].options.get_option(opt) == false
                     );
                     if (remaining.length > 2)
-                        progress.push({"who": 'PP', "where" : group, "what": opt + 1, "because": [open_places[0], open_places[1]]})
+                        progress.push({"who": 'PP', "where" : group, "what": opt, "because": [open_places[0], open_places[1]]})
                 }
             }
         }
@@ -302,9 +338,11 @@ function follow_strat(strat) {
         switch (task.who) {
             case 'HS':
                 cells[task.where].vis = task.what;
+                cells[task.where].reason = 'HS';
                 break;
             case 'NS':
                 cells[task.where].vis = task.what;
+                cells[task.where].reason = 'NS';
                 break;
             case 'NP':
                 // Example: {"who":'NP', "where": group, "because":[key1, key2]}
@@ -330,9 +368,6 @@ function follow_strat(strat) {
     return try_lst;
 }
 
-function working () {
-    
-}
 
 change81(defaultBoard);
 prune_options();

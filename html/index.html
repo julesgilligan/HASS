@@ -3,21 +3,41 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <table id="game_grid" class="sudoku_board">
-    </table>
-
+    <div class="layout">
+        <table id="game_grid" class="sudoku_board">
+        </table>
+        <label for="text_board"> Give the board </label>
+        <input autofocus type="text" id="text_board" minlength="81" maxlength="81" size="81" oninput="text_changed(this)" onchange="repair_options()" />
+        <form id="side_panel">
+            <input type="checkbox" id="check_HS" />
+            <label for="check_HS"> Hidden Singles </label>
+            <br>
+            <input type="checkbox" id="check_NS" />
+            <label for="check_NS"> Naked Singles </label>
+            <br>
+            <input type="checkbox" id="check_NP" />
+            <label for="check_NP"> Naked Pairs </label>
+            <br>
+            <input type="checkbox" id="check_PP" />
+            <label for="check_PP"> Pointing Pairs </label>
+            <br>
+            <span style="cursor:not-allowed;">
+                Naked Triples
+                <br>
+                Hidden Pairs
+            </span>
+            <br>
+            <button type="button" class="button" onclick="button_clicked()">
+                Take Step
+            </button>
+        </form>
+    </div>
     <script>
-        /* Setting up the blank board with all notes */
+        /* Setting up the blank board empty notes lists */
         var game = document.getElementById("game_grid");
 
         var notes = document.createElement("div");
         notes.classList.add("notes_list");
-        for (let i = 1; i <= 9; i++) {
-            note = document.createElement("span");
-            note.classList.add("note");
-            note.innerHTML = i;
-            notes.appendChild(note);
-        }
 
         for (let i = 0; i < 9; i++) {
             var row = game.insertRow();

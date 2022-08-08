@@ -17,6 +17,37 @@ body {
     ) repeat;
 }
 
+.layout {
+    display: grid;
+    grid-template-columns: auto 200px;
+    grid-template-rows: auto 20px;
+    grid-template-areas: 
+    "board panel"
+    "input panel";
+}
+
+#side_panel {
+    grid-area: panel;
+}
+
+.button {
+    background-color: #008CBA;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.button:active {
+    background-color: #3e8e41;
+    transform: translateY(4px);
+  }
+
 /* board */
 .sudoku_board {
     margin:6px auto;
@@ -24,6 +55,7 @@ body {
     border: 3px solid black;
 
     border-collapse: collapse;
+    cursor: not-allowed;
     /* ? */
     user-select: none;
 }
@@ -39,6 +71,14 @@ body {
     border: 1px solid #34495e;
     /* Later
     cursor:pointer; */
+}
+
+.sudoku_board .cell:hover {
+    background-color: #7f8c8d;
+}
+
+.sudoku_board .cell.just_added {
+    text-shadow: 0px 0px 10px #d35400;
 }
 
 .sudoku_board .cell .note {
