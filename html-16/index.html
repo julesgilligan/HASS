@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <head>
+    <title>16x16 Test Ground</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -7,7 +8,7 @@
         <table id="game_grid" class="sudoku_board">
         </table>
         <label for="text_board"> Give the board </label>
-        <input autofocus type="text" id="text_board" minlength="81" maxlength="81" size="81" oninput="text_changed(this)" onchange="repair_options()" />
+        <input autofocus type="text" id="text_board" minlength="256" maxlength="256" size="256" oninput="text_changed(this)" onchange="repair_options()" />
         <form id="side_panel">
             <input type="checkbox" id="check_HS" />
             <label for="check_HS"> Hidden Singles </label>
@@ -32,7 +33,6 @@
             </button>
         </form>
     </div>
-    <div id="flag" style="width:20px; height:20px; background-color: cyan;"</div>
     <script>
         /* Setting up the blank board empty notes lists */
         var game = document.getElementById("game_grid");
@@ -40,10 +40,10 @@
         var notes = document.createElement("div");
         notes.classList.add("notes_list");
 
-        for (let i = 0; i < 9; i++) {
+        for (let i = 0; i < 16; i++) {
             var row = game.insertRow();
             row.classList.add("row");
-            for (let j = 0; j < 9; j++) {
+            for (let j = 0; j < 16; j++) {
                 var cell = document.createElement("td");
                 cell.classList.add("cell");
                 cell.appendChild(notes.cloneNode(true));

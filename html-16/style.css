@@ -1,0 +1,150 @@
+.notes_list {
+    display: flex;
+    flex-wrap: wrap;
+    width:100%;
+}
+
+
+
+body {
+    font-family:verdana,helvetica,arial,sans-serif;
+    border:0px; 
+    margin:0px; 
+    padding:0px;
+        
+    background:url(
+        data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIUlEQVQYV2N89urtfwYiACNIoZSYMCMhtaMK8YYQ0cEDAG5yJ8eLRhTfAAAAAElFTkSuQmCC
+    ) repeat;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: auto 200px;
+    grid-template-rows: auto 20px;
+    grid-template-areas: 
+    "board panel"
+    "input panel";
+}
+
+#side_panel {
+    grid-area: panel;
+}
+
+.button {
+    background-color: #008CBA;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.button:active {
+    background-color: #3e8e41;
+    transform: translateY(4px);
+  }
+
+/* board */
+.sudoku_board {
+    margin:6px auto;
+    box-shadow: 0px 0px 5px 5px #bdc3c7;
+    border: 3px solid black;
+
+    border-collapse: collapse;
+    cursor: not-allowed;
+    /* ? */
+    user-select: none;
+}
+
+.sudoku_board .cell {
+    width:1.5em;
+    height:1.5em;
+    font-size:30px;
+    background:white;
+    padding:0px;
+    box-sizing: border-box;
+    text-align: center;
+    border: 1px solid #34495e;
+    /* Later
+    cursor:pointer; */
+}
+
+.sudoku_board .cell:hover {
+    background-color: #7f8c8d;
+}
+
+.sudoku_board .cell.just_added {
+    text-shadow: 0px 0px 10px #d35400;
+}
+
+.sudoku_board .cell .note {
+    color:#bdc3c7;
+    width: 25%;    
+    text-align:center;
+    font-size:10px;
+}
+
+.cell:nth-of-type(4n) {
+    border-right: 3px solid black;
+}
+
+.row:nth-of-type(4n) {
+    border-bottom: 3px solid black;
+}
+
+.sudoku_board .cell span {
+    color:#2c3e50;
+    font-size:14px;
+    text-align:middle;    
+}
+
+.sudoku_board .cell.selected, .sudoku_board .cell.selected.fix {
+    background:#FFE;    
+}
+
+.sudoku_board .cell.selected.current {
+    position:relative;
+    background: #3498db;
+    font-weight:bold;
+    box-shadow: 0px 0px 3px 3px #bdc3c7;
+}
+
+.sudoku_board .cell.selected.current span {
+    color:white;
+}
+
+.sudoku_board .cell.selected.group {
+    color:blue;    
+}
+
+.sudoku_board .cell span.samevalue, .sudoku_board .cell.fix span.samevalue {
+    font-weight:bold;  
+    color:#3498db;
+}
+
+.sudoku_board .cell.notvalid, .sudoku_board .cell.selected.notvalid{
+    font-weight:bold;
+    color:white;;
+    background:#e74c3c;
+}
+
+.sudoku_board .cell.fix {
+    background:#ecf0f1;
+    cursor:not-allowed;
+}
+
+.sudoku_board .cell.fix span {
+  color:#7f8c8d;
+}
+
+.sudoku_board .cell .solution {
+  font-size:10px;
+  color:#d35400;
+}
+
+
+/*Responsive Stuff*/

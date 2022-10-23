@@ -10,11 +10,13 @@ functionality:
 
 */
 
-
-var defaultBoard = '000105000140000670080002400063070010900000003010090520007200080026000035000409000';
+var defaultBoard =  '......a.1.27c.3..1..e..f...3.5879.3..b..d8..0...5.e0.2.....69d.b' + 
+'.b5.....7..289....4.3.0ef6.a......8..9....b.a.74..0.ca......f.d.' +
+'.9.b......6e.2..45.e.7....1..a......5.1a39.f.7....a7b..d.....19.' +
+'d.f40.....7.3e.2...3..e8..f..c.a8ec.a...6..0..5..a.54f.7.2......';
 
 function text_changed(arg) {
-    change81(arg.value);
+    change256(arg.value);
     printtable();
 }
 
@@ -23,7 +25,7 @@ class Options{
     fill(val) {
         this.data = [];
         if (val === false) {
-            for (let i = 1; i <= 9; i++){
+            for (let i = 0; i < 16; i++){
                 this.data.push(i);
         }}
         return this
@@ -46,49 +48,53 @@ class Options{
     }
 }
 
-var cells = new Array(81);
-for (let i = 0; i < 81; i++){
-    let cell = {vis: 0, options: new Options().fill(false), pruned: false};
+var cells = new Array(256);
+for (let i = 0; i < 256; i++){
+    let cell = {vis: null, options: new Options().fill(false), pruned: false};
     cells[i] = cell
 }
 
-var rows = new Array(9);
-var cols = new Array(9);
-var boxes = new Array(9);
+var rows = new Array(16);
+var cols = new Array(16);
+var boxes = new Array(16);
 
 function make_groups(){
-    var temp = new Int8Array(9);
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++ ){
-            temp[j] = i*9 + j;
+    var temp = new Array(16);
+    for (let i = 0; i < 16; i++) {
+        for (let j = 0; j < 16; j++ ){
+            temp[j] = i*16 + j;
         }
-        rows[i] = Int8Array.from(temp);
+        rows[i] = Array.from(temp);
         
-        for (let j = 0; j < 9; j++ ){
-            temp[j] = i + j*9;
+        for (let j = 0; j < 16; j++ ){
+            temp[j] = i + j*16;
         }
-        cols[i] = Int8Array.from(temp);
+        cols[i] = Array.from(temp);
     }
     
-    boxes[0] = Int8Array.of(0,1,2,9,10,11,18,19,20);
-    boxes[1] = Int8Array.of(3,4,5,12,13,14,21,22,23);
-    boxes[2] = Int8Array.of(6,7,8,15,16,17,24,25,26);
-    boxes[3] = Int8Array.of(27,28,29,36,37,38,45,46,47);
-    boxes[4] = Int8Array.of(30,31,32,39,40,41,48,49,50);
-    boxes[5] = Int8Array.of(33,34,35,42,43,44,51,52,53);
-    boxes[6] = Int8Array.of(54,55,56,63,64,65,72,73,74);
-    boxes[7] = Int8Array.of(57,58,59,66,67,68,75,76,77);
-    boxes[8] = Int8Array.of(60,61,62,69,70,71,78,79,80);
+    for (let i = 0; i < 16; i++) {
+        let first = rows[parseInt(i / 4) * 4].slice(4 * (i % 4), 4 * ((i % 4) + 1));
+        let second = rows[parseInt(i / 4) * 4 + 1].slice(4 * (i % 4), 4 * ((i % 4) + 1));
+        let third = rows[parseInt(i / 4) * 4 + 2].slice(4 * (i % 4), 4 * ((i % 4) + 1));
+        let fourth = rows[parseInt(i / 4) * 4 + 3].slice(4 * (i % 4), 4 * ((i % 4) + 1));
+
+        boxes[i] = first.concat(second, third, fourth);
+    }
 }
 make_groups();
 
-function change81(input){
+function change256(input){
+    function valid(el) {
+        return( parseInt(el, 16).toString(16) == el);
+    }
     /* Accept input of 81 char for board */
-    var in_board = Array.from(input).map(Number);
+    var in_board = Array.from(input);
     in_board.forEach( (el, i) => {
-        if (i < 81 && typeof el == 'number' && el >= 0) {
-            cells[i].vis = parseInt(el);
+        if (i < 256 && valid(el)) {
+            cells[i].vis = parseInt(el, 16);//el.toString(16).toUpperCase();
             cells[i].reason = "Given";
+        } else {
+            cells[i].vis = null;
         }
     });
 }
@@ -102,7 +108,6 @@ function repair_options(){
         }
         cell.pruned = false;
     });
-    console.log(cells);
     prune_options();
     printtable();
 }
@@ -135,22 +140,8 @@ function show_reasons(evt) {
 }
 
 function hide_reasons(evt) {
-}
 
-function show_index(evt) {
-    let index = evt.currentTarget.index;
-    let flag = document.getElementById("flag");
-    flag.style.display = "block";
-    flag.style.position = "absolute";
-    flag.style.left = `${evt.clientX - 20}px`;
-    flag.style.top = `${evt.clientY - 20}px`;
-    flag.innerHTML = index;
 }
-
-function hide_index(evt) {
-    flag.style.display = "none";
-}
-
 
 function make_notes_list(cell_obj) {
     var notes = document.createElement("div");
@@ -158,7 +149,7 @@ function make_notes_list(cell_obj) {
     cell_obj.options.open().forEach(option => {
         let note = document.createElement("span");
         note.classList.add("note");
-        note.innerHTML = option;
+        note.innerHTML = option.toString(16);
         notes.appendChild(note);
     })
     return notes;
@@ -174,14 +165,12 @@ function printtable(){
         added.removeEventListener('mouseover', show_reasons);
         added.removeEventListener('mouseout', hide_reasons);
     });
-    for (let i = 0; i < 81; i++) {
-        board_cells[i].index = i;
-        board_cells[i].addEventListener('mouseover', show_index);
-        board_cells[i].addEventListener('mouseout', hide_index);
-        if (cells[i].vis != 0){
-            if (board_cells[i].innerHTML != cells[i].vis) {
-                board_cells[i].innerHTML = cells[i].vis;
+    for (let i = 0; i < 256; i++) {
+        if (cells[i].vis != null){
+            if (board_cells[i].innerHTML != cells[i].vis.toString(16).toUpperCase()) {
+                board_cells[i].innerHTML = cells[i].vis.toString(16).toUpperCase();
                 board_cells[i].classList.add("just_added");
+                board_cells[i].index = i;
                 board_cells[i].addEventListener('mouseover', show_reasons);
                 board_cells[i].addEventListener('mouseout', hide_reasons);
             }
@@ -191,10 +180,10 @@ function printtable(){
     }
 }
 
-function removeFrom(number, group) {
+function removeFrom(hexnumber, group) {
     /* TODO implement accept group reference */
     group.forEach(cell => {
-        cells[cell].options.set_option(number, true);
+        cells[cell].options.set_option(hexnumber, true);
     });
 }
 
@@ -210,11 +199,11 @@ function arrayEquals(a, b) {
 
 function GetRow(num){
     /* TODO implement return reference */
-    return rows[parseInt(num / 9)];
+    return rows[parseInt(num / 16)];
 }
 function GetCol(num){
     /* TODO implement return reference */
-    return cols[num % 9];
+    return cols[num % 16];
 }
 function GetBox(num){
     /* TODO implement return reference */
@@ -237,7 +226,7 @@ function sharedGroup(first, second) {
 function prune_options(){
     cells.forEach((cell, i) => {
         modify = cell.vis;
-        if (modify > 0 && cell.pruned == false){
+        if (modify != null && cell.pruned == false){
             removeFrom(modify, GetRow(i));
             removeFrom(modify, GetCol(i));
             removeFrom(modify, GetBox(i));
@@ -260,7 +249,7 @@ function prune_options(){
 function hiddenSingles() {
     let progress = [];
     rows.concat(cols, boxes).forEach(group => {
-        for (let opt = 1; opt <= 9; opt++) {
+        for (let opt = 0; opt < 16; opt++) {
             let open_places = group.filter(num => 
                 cells[num].options.get_option(opt) == false
             );
@@ -279,7 +268,7 @@ function hiddenSingles() {
 function nakedSingles() {
     let progress = [];
     cells.forEach((cell, index) => {
-        if (cell.vis == 0) {
+        if (cell.vis == null) {
             let openOptions = cell.options.open();
             if (openOptions.length == 1) {
                 progress.push({"who":'NS', "where":index, "what":openOptions[0]});
@@ -331,7 +320,7 @@ function nakedPairs() {
 function pointingPair() {
     let progress = [];
     boxes.forEach(box => {
-        for (let opt = 1; opt <= 9; opt++) {
+        for (let opt = 0; opt < 16; opt++) {
             let open_places = box.filter(num => 
                 cells[num].options.get_option(opt) == false
             );
@@ -391,6 +380,6 @@ function follow_strat(strat) {
 }
 
 
-change81(defaultBoard);
+change256(defaultBoard);
 prune_options();
 printtable();
