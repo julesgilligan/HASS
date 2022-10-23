@@ -1,4 +1,10 @@
 # HASS
+
+## HTML & GitHub Pages
+
+Github pages reads from `/docs` which might be behind the version of `/html`. These are reimplementations of the perl algorithm in Javascript and my main developemental focus.
+
+## Perl
 This is my Human Algorithm Sudoku Solver. I didn't want the routine search algorithm with backtracking so I made this one that searches the way I would. Just faster.
 
 Run the main script with `perl solver.pl [verbose]`. The only recognized verbose keyword is `loud` with everything else defaulting to "quiet".
